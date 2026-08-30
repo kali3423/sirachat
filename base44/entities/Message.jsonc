@@ -1,0 +1,62 @@
+{
+  "name": "Message",
+  "type": "object",
+  "properties": {
+    "text": {
+      "type": "string"
+    },
+    "sender_name": {
+      "type": "string",
+      "description": "Username of the sender"
+    },
+    "recipient": {
+      "type": "string",
+      "description": "Username of the recipient (1-on-1 conversation)"
+    },
+    "recipient_id": {
+      "type": "string",
+      "description": "Legacy field (unused)"
+    },
+    "image_url": {
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "file_name": {
+      "type": "string"
+    },
+    "file_type": {
+      "type": "string"
+    },
+    "sticker": {
+      "type": "string"
+    },
+    "reply_to": {
+      "type": "string",
+      "description": "Id of the message this one replies to"
+    },
+    "reactions": {
+      "type": "object",
+      "description": "Map of emoji -> array of usernames who reacted",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "read": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the recipient has seen the message (read receipt)"
+    }
+  },
+  "required": [],
+  "rls": {
+    "read": true,
+    "create": true,
+    "update": true,
+    "delete": true
+  }
+}

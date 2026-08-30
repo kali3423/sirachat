@@ -1,0 +1,47 @@
+{
+  "name": "StudyHistory",
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "description": "Id of the user this event belongs to"
+    },
+    "user_name": {
+      "type": "string",
+      "description": "Display name of the user"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "completed",
+        "break",
+        "quit"
+      ],
+      "description": "Type of study event"
+    },
+    "points_change": {
+      "type": "number",
+      "default": 0,
+      "description": "Points added (positive) or removed (negative)"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Subject studied during the event"
+    },
+    "duration_min": {
+      "type": "number",
+      "default": 0,
+      "description": "Duration of the study session in minutes"
+    }
+  },
+  "required": [
+    "action",
+    "points_change"
+  ],
+  "rls": {
+    "read": true,
+    "create": true,
+    "update": true,
+    "delete": true
+  }
+}

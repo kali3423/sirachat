@@ -1,0 +1,58 @@
+{
+  "name": "StudyMeet",
+  "type": "object",
+  "properties": {
+    "subject": {
+      "type": "string",
+      "description": "Subject of the study rendezvous"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of the study session"
+    },
+    "start_time": {
+      "type": "string",
+      "description": "Planned start time HH:MM"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Planned end time HH:MM"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "scheduled",
+        "active",
+        "completed"
+      ],
+      "default": "scheduled"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the chrono was started"
+    },
+    "ended_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the session was completed"
+    },
+    "created_by_name": {
+      "type": "string",
+      "description": "Display name of who created the rendezvous"
+    }
+  },
+  "required": [
+    "subject",
+    "date",
+    "start_time",
+    "end_time"
+  ],
+  "rls": {
+    "read": true,
+    "create": true,
+    "update": true,
+    "delete": true
+  }
+}

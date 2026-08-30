@@ -1,0 +1,31 @@
+{
+  "name": "AppSetting",
+  "type": "object",
+  "properties": {
+    "app_name": {
+      "type": "string",
+      "description": "Display name of the app shown in the sidebar and header"
+    },
+    "logo_url": {
+      "type": "string",
+      "description": "Optional logo image URL; falls back to the default monogram"
+    },
+    "tagline": {
+      "type": "string",
+      "description": "Short subtitle shown under the app name"
+    },
+    "agora_app_id": {
+      "type": "string",
+      "description": "Agora App ID used for voice/video calls (App ID-only authentication)"
+    }
+  },
+  "required": [
+    "app_name"
+  ],
+  "rls": {
+    "read": true,
+    "create": true,
+    "update": true,
+    "delete": true
+  }
+}

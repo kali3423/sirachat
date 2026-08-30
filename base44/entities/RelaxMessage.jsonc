@@ -1,0 +1,23 @@
+{
+  "name": "RelaxMessage",
+  "type": "object",
+  "properties": {
+    "text": {
+      "type": "string",
+      "description": "Message text"
+    },
+    "sender_name": {
+      "type": "string",
+      "description": "Display name of the sender"
+    }
+  },
+  "required": [
+    "text"
+  ],
+  "rls": {
+    "read": true,
+    "create": true,
+    "update": true,
+    "delete": true
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "name": "RecoveryDay",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Calendar day in YYYY-MM-DD"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "clean",
+        "relapse"
+      ],
+      "description": "clean = stayed clean that day, relapse = relapsed"
+    }
+  },
+  "required": [
+    "date",
+    "status"
+  ],
+  "rls": {
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

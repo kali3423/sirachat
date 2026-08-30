@@ -1,0 +1,45 @@
+{
+  "name": "TimetableEntry",
+  "type": "object",
+  "properties": {
+    "day": {
+      "type": "string",
+      "enum": [
+        "lundi",
+        "mardi",
+        "mercredi",
+        "jeudi",
+        "vendredi",
+        "samedi"
+      ],
+      "description": "Day of the week"
+    },
+    "start_time": {
+      "type": "number",
+      "description": "Start hour (8-18)"
+    },
+    "end_time": {
+      "type": "number",
+      "description": "End hour (9-18)"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Subject name shown in the cell"
+    },
+    "color": {
+      "type": "string",
+      "description": "Hex color of the cell"
+    }
+  },
+  "required": [
+    "day",
+    "start_time",
+    "end_time"
+  ],
+  "rls": {
+    "read": true,
+    "create": true,
+    "update": true,
+    "delete": true
+  }
+}

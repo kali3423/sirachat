@@ -1,0 +1,35 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-Requested-With, Content-Type, Authorization, api_key"
+        }
+      ]
+    }
+  ],
+  "env": {
+    "VITE_BASE44_APP_ID": "6a90eaccbc4b30a948747d0b",
+    "VITE_BASE44_API_KEY": "57c9c4f8279e45c686cb8f3be7d08e6a",
+    "VITE_BASE44_API_URL": "https://app.base44.com"
+  }
+}

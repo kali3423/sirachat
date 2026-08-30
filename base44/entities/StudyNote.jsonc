@@ -1,0 +1,27 @@
+{
+  "name": "StudyNote",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Title of the note"
+    },
+    "subject": {
+      "type": "string",
+      "description": "Optional subject the note belongs to"
+    },
+    "content": {
+      "type": "string",
+      "description": "Body of the note"
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "read": true,
+    "create": true,
+    "update": true,
+    "delete": true
+  }
+}

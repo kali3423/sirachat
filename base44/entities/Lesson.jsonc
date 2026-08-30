@@ -1,0 +1,33 @@
+{
+  "name": "Lesson",
+  "type": "object",
+  "properties": {
+    "subject_id": {
+      "type": "string",
+      "description": "Id of the subject this lesson belongs to"
+    },
+    "title": {
+      "type": "string",
+      "description": "Lesson title"
+    },
+    "pdf_url": {
+      "type": "string",
+      "description": "Uploaded PDF file URL"
+    },
+    "description": {
+      "type": "string",
+      "description": "Optional short description"
+    }
+  },
+  "required": [
+    "subject_id",
+    "title",
+    "pdf_url"
+  ],
+  "rls": {
+    "read": true,
+    "create": true,
+    "update": true,
+    "delete": true
+  }
+}
