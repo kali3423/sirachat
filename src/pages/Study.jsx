@@ -23,7 +23,9 @@ export default function Study() {
       const ms = await base44.entities.StudyMeet.list("-created_date", 100).catch(() => []);
       let hh = [];
       if (m) hh = await base44.entities.StudyHistory.filter({ user_id: m.id }, "-created_date", 200).catch(() => []);
-      setMe(m); setMeets(ms); setHistory(hh);
+      setMe(m); 
+      setMeets(Array.isArray(ms) ? ms : []); 
+      setHistory(Array.isArray(hh) ? hh : []);
     } finally {
       setLoading(false);
     }

@@ -53,6 +53,16 @@ Multiple pages and components were calling `base44.entities.[Entity].list()` and
 - **Fix:** Added array validation for both: `setSubjects(Array.isArray(s) ? s : [])`
 - **Line:** 19-24
 
+### 10. **src/pages/Notes.jsx**
+- **Issue:** `StudyNote.list()` result used directly without array validation
+- **Fix:** Added array validation: `setNotes(Array.isArray(data) ? data : [])`
+- **Line:** 12-16
+
+### 11. **src/pages/Study.jsx**
+- **Issue:** `StudyMeet.list()` and `StudyHistory.filter()` results used directly
+- **Fix:** Added array validation: `setMeets(Array.isArray(ms) ? ms : [])` and `setHistory(Array.isArray(hh) ? hh : [])`
+- **Line:** 20-30
+
 ## Pattern Used
 
 All fixes follow this defensive pattern:

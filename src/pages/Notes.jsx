@@ -11,7 +11,7 @@ export default function Notes() {
 
   const load = async () => {
     const data = await base44.entities.StudyNote.list("-created_date", 200).catch(() => []);
-    setNotes(data);
+    setNotes(Array.isArray(data) ? data : []);
     setLoading(false);
   };
 
