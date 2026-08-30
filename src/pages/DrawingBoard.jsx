@@ -28,9 +28,12 @@ export default function DrawingBoard() {
     ctx.lineJoin = "round";
     ctxRef.current = ctx;
 
-    base44.entities.Drawing.list("-created_date", 50).then((d) => { setSaved(d); setLoading(false); });
+    base44.entities.Drawing.list("-created_date", 50).then((d) => { 
+      setSaved(Array.isArray(d) ? d : []); 
+      setLoading(false); 
+    }).catch(() => setLoading(false));
     const unsub = base44.entities.Drawing.subscribe(() => {
-      base44.entities.Drawing.list("-created_date", 50).then(setSaved);
+      base44.entities.Drawing.list("-created_date", 50).then(d => setSaved(Array.isArray(d) ? d : []));
     });
     return unsub;
   }, []);

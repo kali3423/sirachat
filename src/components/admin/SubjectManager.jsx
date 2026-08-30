@@ -19,8 +19,8 @@ export default function SubjectManager() {
   const load = async () => {
     const s = await base44.entities.Subject.list("created_date", 200).catch(() => []);
     const l = await base44.entities.Lesson.list("created_date", 500).catch(() => []);
-    setSubjects(s);
-    setLessons(l);
+    setSubjects(Array.isArray(s) ? s : []);
+    setLessons(Array.isArray(l) ? l : []);
   };
 
   useEffect(() => {

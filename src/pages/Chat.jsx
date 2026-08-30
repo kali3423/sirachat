@@ -35,8 +35,16 @@ export default function Chat() {
 
   useEffect(() => {
     base44.entities.AppSetting.list().then((s) => {
-      if (s && s[0]) setAppId(s[0].agora_app_id || "");
-    }).catch(() => {});
+      const settings = Array.isArray(s) ? s : (s ? [s] : []);
+      if (settings.length > 0 && settings[0]) {
+        setAppId(settings[0].agora_app_id || import.meta.env.VITE_AGORA_APP_ID || "");
+      } else {
+        setAppId(import.meta.env.VITE_AGORA_APP_ID || "");
+      }
+    }).catch(() => {
+      // Fallback to environment variable if AppSetting fails
+      setAppId(import.meta.env.VITE_AGORA_APP_ID || "");
+    });
     base44.entities.Message.list("created_date", 500).then((msgs) => {
       setMessages(Array.isArray(msgs) ? msgs : []);
       setLoading(false);

@@ -14,12 +14,16 @@ export default function Subjects() {
     (async () => {
       const s = await base44.entities.Subject.list("created_date", 200).catch(() => []);
       const l = await base44.entities.Lesson.list("created_date", 500).catch(() => []);
-      setSubjects(s);
-      setLessons(l);
+      setSubjects(Array.isArray(s) ? s : []);
+      setLessons(Array.isArray(l) ? l : []);
       setLoading(false);
     })();
-    const u1 = base44.entities.Subject.subscribe(() => { base44.entities.Subject.list("created_date", 200).then(setSubjects); });
-    const u2 = base44.entities.Lesson.subscribe(() => { base44.entities.Lesson.list("created_date", 500).then(setLessons); });
+    const u1 = base44.entities.Subject.subscribe(() => { 
+      base44.entities.Subject.list("created_date", 200).then(s => setSubjects(Array.isArray(s) ? s : [])); 
+    });
+    const u2 = base44.entities.Lesson.subscribe(() => { 
+      base44.entities.Lesson.list("created_date", 500).then(l => setLessons(Array.isArray(l) ? l : [])); 
+    });
     return () => { u1(); u2(); };
   }, []);
 

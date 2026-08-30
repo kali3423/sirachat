@@ -43,10 +43,11 @@ export default function AppShell() {
 
   useEffect(() => {
     base44.entities.AppSetting.list().then((s) => {
-      if (s && s[0]) {
-        setAppName(s[0].app_name || "Sira Chat");
-        setTagline(s[0].tagline || "Chat together");
-        setLogoUrl(s[0].logo_url || "");
+      const settings = Array.isArray(s) ? s : (s ? [s] : []);
+      if (settings.length > 0 && settings[0]) {
+        setAppName(settings[0].app_name || "Sira Chat");
+        setTagline(settings[0].tagline || "Chat together");
+        setLogoUrl(settings[0].logo_url || "");
       }
     }).catch(() => {});
   }, []);

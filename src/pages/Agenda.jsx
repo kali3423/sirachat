@@ -18,8 +18,8 @@ export default function Agenda() {
 
   const load = async () => {
     setLoading(true);
-    const data = await base44.entities.Event.list("date", 200);
-    setEvents(data);
+    const data = await base44.entities.Event.list("date", 200).catch(() => []);
+    setEvents(Array.isArray(data) ? data : []);
     setLoading(false);
   };
 

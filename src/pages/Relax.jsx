@@ -24,7 +24,9 @@ export default function Relax() {
 
   useEffect(() => {
     base44.auth.me().then(setMe).catch(() => {});
-    base44.entities.RelaxMessage.list("created_date", 200).then(setMessages).catch(() => {});
+    base44.entities.RelaxMessage.list("created_date", 200).then((msgs) => {
+      setMessages(Array.isArray(msgs) ? msgs : []);
+    }).catch(() => {});
     const unsub = base44.entities.RelaxMessage.subscribe((event) => {
       setMessages((prev) => (prev.some((m) => m.id === event.id) ? prev : [...prev, event.data].sort((a, b) => new Date(a.created_date) - new Date(b.created_date))));
     });

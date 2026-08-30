@@ -19,8 +19,8 @@ export default function Todos() {
 
   const load = async () => {
     setLoading(true);
-    const data = await base44.entities.Todo.list("-created_date", 200);
-    setTodos(data);
+    const data = await base44.entities.Todo.list("-created_date", 200).catch(() => []);
+    setTodos(Array.isArray(data) ? data : []);
     setLoading(false);
   };
 

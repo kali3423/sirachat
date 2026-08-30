@@ -16,8 +16,8 @@ export default function StudySchedule() {
 
   const load = async () => {
     setLoading(true);
-    const data = await base44.entities.StudySession.list("created_date", 200);
-    setSessions(data);
+    const data = await base44.entities.StudySession.list("created_date", 200).catch(() => []);
+    setSessions(Array.isArray(data) ? data : []);
     setLoading(false);
   };
 
