@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { Plus, Trash2, Flag, Calendar as CalIcon, Check } from "lucide-react";
-import T from "@/components/T";
+import { Plus, Trash2, ListChecks, Calendar as CalIcon, Check, CheckCircle2 } from "lucide-react";
+import { PageShell, PageHeader, EmptyState, Chip } from "@/components/sira";
+import { SkeletonRow } from "@/components/sira/Skeleton";
+import { useI18n } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 const PRIORITY = {
-  high: { label: "High", color: "text-[#FF4D00] bg-orange-50", dot: "bg-orange-500" },
-  medium: { label: "Medium", color: "text-[#FF4D00] bg-orange-50", dot: "bg-orange-500" },
-  low: { label: "Low", color: "text-emerald-600 bg-emerald-50", dot: "bg-emerald-500" },
+  high: { label: "High", tone: "danger" },
+  medium: { label: "Medium", tone: "warning" },
+  low: { label: "Low", tone: "success" },
 };
 
 export default function Todos() {
+  const { t } = useI18n();
   const [todos, setTodos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [title, setTitle] = useState("");
@@ -57,39 +61,37 @@ export default function Todos() {
     const p = PRIORITY[t.priority] || PRIORITY.medium;
     const overdue = t.due_date && new Date(t.due_date) < new Date(new Date().toDateString()) && !t.done;
     return (
-      <div className="group flex items-center gap-3 rounded-xl border border-border bg-background px-3.5 py-3 shadow-sm transition hover:shadow-md">
+      <div className="group flex items-center gap-3 rounded-2xl border border-border bg-card px-3.5 py-3 shadow-sm transition-all hover:border-primary/25 hover:shadow-soft">
         <button
           onClick={() => toggle(t)}
-          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition ${
-            t.done ? "border-[#FF4D00] bg-orange-500 text-white" : "border-border hover:border-[#FF8047]"
-          }`}
+          aria-label={t.done ? "Mark as not done" : "Mark as done"}
+          className={cn(
+            "flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 transition press",
+            t.done ? "border-completed bg-completed text-white" : "border-border hover:border-primary"
+          )}
         >
           {t.done && <Check className="h-3 w-3" />}
         </button>
         <div className="min-w-0 flex-1">
-          <p className={`text-sm font-medium ${t.done ? "text-muted-foreground line-through" : "text-foreground"}`}>
+          <p className={cn("text-sm font-medium", t.done ? "text-muted-foreground line-through" : "text-foreground")}>
             {t.title}
           </p>
           <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px]">
-            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium ${p.color}`}>
-              <span className={`h-1.5 w-1.5 rounded-full ${p.dot}`} />
-              {p.label}
-            </span>
+            <Chip tone={p.tone} dot className="px-2 py-0.5 text-[11px]">{p.label}</Chip>
             {t.due_date && (
-              <span className={`inline-flex items-center gap-1 ${overdue ? "text-red-600 font-medium" : "text-muted-foreground"}`}>
+              <span className={cn("inline-flex items-center gap-1 tabnums", overdue ? "font-semibold text-danger" : "text-muted-foreground")}>
                 <CalIcon className="h-3 w-3" />
                 {new Date(t.due_date).toLocaleDateString()}
                 {overdue && " · overdue"}
               </span>
             )}
-            {t.assigned_to && (
-              <span className="text-muted-foreground">@{t.assigned_to}</span>
-            )}
+            {t.assigned_to && <span className="text-muted-foreground">@{t.assigned_to}</span>}
           </div>
         </div>
         <button
           onClick={() => remove(t.id)}
-          className="rounded-lg p-1.5 text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+          aria-label="Delete task"
+          className="rounded-lg p-1.5 text-muted-foreground opacity-0 transition hover:bg-danger/10 hover:text-danger group-hover:opacity-100 press"
         >
           <Trash2 className="h-4 w-4" />
         </button>
@@ -98,58 +100,66 @@ export default function Todos() {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-gradient-to-b from-slate-50 to-emerald-50/20 dark:bg-none dark:bg-background">
-      <div className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground"><T k="todos.title" /></h1>
-          <p className="text-sm text-muted-foreground"><T k="todos.sub" /></p>
+    <PageShell width="sm">
+      <PageHeader
+        icon={ListChecks}
+        title={t("todos.title") || "Tasks"}
+        subtitle={t("todos.sub") || "Track what needs doing — together."}
+      />
+
+      <form onSubmit={add} className="mb-6 rounded-2xl border border-border bg-card p-4 shadow-sm">
+        <div className="flex gap-2">
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Add a task…"
+            className="flex-1 rounded-xl border border-input bg-background px-3.5 py-2.5 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+          />
+          <button type="submit" className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-accent transition hover:bg-primary-strong press">
+            <Plus className="h-4 w-4" /> {t("common.add") || "Add"}
+          </button>
         </div>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <input type="date" value={due} onChange={(e) => setDue(e.target.value)} className="rounded-lg border border-input bg-background px-3 py-1.5 text-xs outline-none transition focus-visible:ring-2 focus-visible:ring-ring tabnums" />
+          <select value={priority} onChange={(e) => setPriority(e.target.value)} className="rounded-lg border border-input bg-background px-3 py-1.5 text-xs outline-none transition focus-visible:ring-2 focus-visible:ring-ring">
+            <option value="low">Low priority</option>
+            <option value="medium">Medium priority</option>
+            <option value="high">High priority</option>
+          </select>
+          <input value={assigned} onChange={(e) => setAssigned(e.target.value)} placeholder="Assigned to" className="rounded-lg border border-input bg-background px-3 py-1.5 text-xs outline-none transition focus-visible:ring-2 focus-visible:ring-ring" />
+        </div>
+      </form>
 
-        <form onSubmit={add} className="mb-6 rounded-2xl border border-border bg-background p-4 shadow-sm">
-          <div className="flex gap-2">
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Add a task…"
-              className="flex-1 rounded-xl border border-border bg-muted/40 px-3.5 py-2.5 text-sm outline-none focus:border-[#FF8047] focus:bg-background focus:ring-2 focus:ring-orange-100"
-            />
-            <button type="submit" className="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-orange-500 to-[#FF6B2C] px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-[#FF4D00]/30 transition hover:opacity-90">
-              <Plus className="h-4 w-4" /> <T k="common.add" />
-            </button>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <input type="date" value={due} onChange={(e) => setDue(e.target.value)} className="rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-xs outline-none focus:border-[#FF8047]" />
-            <select value={priority} onChange={(e) => setPriority(e.target.value)} className="rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-xs outline-none focus:border-[#FF8047]">
-              <option value="low">Low priority</option>
-              <option value="medium">Medium priority</option>
-              <option value="high">High priority</option>
-            </select>
-            <input value={assigned} onChange={(e) => setAssigned(e.target.value)} placeholder="Assigned to" className="rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-xs outline-none focus:border-[#FF8047]" />
-          </div>
-        </form>
-
-        {loading ? (
-          <div className="flex justify-center py-10"><div className="h-6 w-6 animate-spin rounded-full border-2 border-orange-200 border-t-amber-600" /></div>
-        ) : (
-          <div className="space-y-5">
-            <section>
-              <h2 className="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                <Flag className="h-3.5 w-3.5" /> To do · {open.length}
-              </h2>
-              <div className="space-y-2">
-                {open.length === 0 ? <p className="rounded-xl border border-dashed border-border py-6 text-center text-xs text-muted-foreground">All clear! </p>
-                  : open.map((t) => <Row key={t.id} t={t} />)}
-              </div>
-            </section>
-            {done.length > 0 && (
-              <section>
-                <h2 className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Completed · {done.length}</h2>
-                <div className="space-y-2 opacity-70">{done.map((t) => <Row key={t.id} t={t} />)}</div>
-              </section>
+      {loading ? (
+        <div className="space-y-2 rounded-2xl border border-border bg-card">
+          {Array.from({ length: 4 }).map((_, i) => <SkeletonRow key={i} />)}
+        </div>
+      ) : (
+        <div className="space-y-5">
+          <section>
+            <h2 className="mb-2 flex items-center gap-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+              <ListChecks className="h-3.5 w-3.5" /> To do · <span className="tabnums">{open.length}</span>
+            </h2>
+            {open.length === 0 ? (
+              <EmptyState
+                icon={CheckCircle2}
+                title="All clear!"
+                description="No open tasks right now. Add one above to get started."
+              />
+            ) : (
+              <div className="space-y-2">{open.map((t) => <Row key={t.id} t={t} />)}</div>
             )}
-          </div>
-        )}
-      </div>
-    </div>
+          </section>
+          {done.length > 0 && (
+            <section>
+              <h2 className="mb-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                Completed · <span className="tabnums">{done.length}</span>
+              </h2>
+              <div className="space-y-2 opacity-70">{done.map((t) => <Row key={t.id} t={t} />)}</div>
+            </section>
+          )}
+        </div>
+      )}
+    </PageShell>
   );
 }

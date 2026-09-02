@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useI18n } from "@/lib/i18n";
 
 const GRID_SIZE = 20;
 const CELL_SIZE = 20;
@@ -6,6 +7,7 @@ const INITIAL_SNAKE = [[10, 10]];
 const INITIAL_DIRECTION = { x: 1, y: 0 };
 
 export default function SnakeGame() {
+  const { t } = useI18n();
   const [snake, setSnake] = useState(INITIAL_SNAKE);
   const [food, setFood] = useState([15, 15]);
   const [direction, setDirection] = useState(INITIAL_DIRECTION);
@@ -29,7 +31,6 @@ export default function SnakeGame() {
           head[1] + directionRef.current.y,
         ];
 
-        // Check collision with walls
         if (
           newHead[0] < 0 ||
           newHead[0] >= GRID_SIZE ||
@@ -41,7 +42,6 @@ export default function SnakeGame() {
           return prevSnake;
         }
 
-        // Check collision with self
         if (prevSnake.some(([x, y]) => x === newHead[0] && y === newHead[1])) {
           setGameOver(true);
           setRunning(false);
@@ -50,7 +50,6 @@ export default function SnakeGame() {
 
         const newSnake = [newHead, ...prevSnake];
 
-        // Check if food eaten
         if (newHead[0] === food[0] && newHead[1] === food[1]) {
           setScore((s) => s + 10);
           setFood([
@@ -72,9 +71,9 @@ export default function SnakeGame() {
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (!running) return;
-      
+
       const { x, y } = directionRef.current;
-      
+
       if (e.key === "ArrowUp" && y === 0) {
         setDirection({ x: 0, y: -1 });
       } else if (e.key === "ArrowDown" && y === 0) {
@@ -102,21 +101,18 @@ export default function SnakeGame() {
   return (
     <div className="mx-auto max-w-md">
       <div className="mb-3 flex items-center justify-between">
-        <p className="text-sm font-medium text-foreground">Score: {score}</p>
-        {gameOver && (
-          <p className="text-sm font-semibold text-red-600">Game Over!</p>
-        )}
+        <p className="text-sm font-semibold text-foreground">{t("relak.g.scoreN", { n: score })}</p>
+        {gameOver && <p className="text-sm font-bold text-danger">{t("relak.g.gameOver")}</p>}
       </div>
 
       <div
-        className="mx-auto rounded-2xl border-2 border-[#FF4D00] bg-gradient-to-br from-orange-50 to-orange-100 p-2 shadow-lg dark:from-orange-950/20 dark:to-orange-900/20"
+        className="mx-auto rounded-2xl border-2 border-primary/40 bg-primary-soft p-2 shadow-soft"
         style={{
           width: GRID_SIZE * CELL_SIZE + 16,
           height: GRID_SIZE * CELL_SIZE + 16,
         }}
       >
         <div className="relative" style={{ width: GRID_SIZE * CELL_SIZE, height: GRID_SIZE * CELL_SIZE }}>
-          {/* Snake */}
           {snake.map(([x, y], i) => (
             <div
               key={i}
@@ -126,12 +122,11 @@ export default function SnakeGame() {
                 top: y * CELL_SIZE,
                 width: CELL_SIZE - 2,
                 height: CELL_SIZE - 2,
-                backgroundColor: i === 0 ? "#FF4D00" : "#FF8047",
+                backgroundColor: i === 0 ? "hsl(var(--primary))" : "hsl(var(--primary) / 0.6)",
               }}
             />
           ))}
 
-          {/* Food */}
           <div
             className="absolute animate-pulse rounded-full"
             style={{
@@ -139,7 +134,7 @@ export default function SnakeGame() {
               top: food[1] * CELL_SIZE,
               width: CELL_SIZE - 2,
               height: CELL_SIZE - 2,
-              backgroundColor: "#10b981",
+              backgroundColor: "hsl(var(--success))",
             }}
           />
         </div>
@@ -147,15 +142,13 @@ export default function SnakeGame() {
 
       <button
         onClick={startGame}
-        className="mt-4 w-full rounded-xl bg-gradient-to-r from-[#FF4D00] to-[#FF6B2C] py-3 text-sm font-bold text-white shadow-lg transition-all hover:shadow-xl"
+        className="press mt-4 w-full rounded-xl bg-sira py-3 text-sm font-bold text-white shadow-accent transition-all hover:brightness-105"
       >
-        {gameOver ? "Play Again" : running ? "Restart" : "Start Game"}
+        {gameOver ? t("relak.g.playAgain") : running ? t("relak.g.restart") : t("relak.g.startGame")}
       </button>
 
       {!running && (
-        <p className="mt-2 text-center text-xs text-muted-foreground">
-          Use arrow keys to control the snake
-        </p>
+        <p className="mt-2 text-center text-xs text-muted-foreground">{t("relak.g.snakeHint")}</p>
       )}
     </div>
   );

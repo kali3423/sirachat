@@ -18,7 +18,9 @@ export default function LangThemeSwitcher() {
           <button
             key={l.code}
             onClick={() => setLang(l.code)}
-            className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition ${lang === l.code ? "bg-orange-500 text-white" : "text-muted-foreground hover:text-foreground"}`}
+            aria-label={l.label}
+            aria-pressed={lang === l.code}
+            className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition press ${lang === l.code ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
           >
             {l.label}
           </button>

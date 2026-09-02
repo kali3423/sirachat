@@ -6,9 +6,11 @@ module.exports = {
   	extend: {
   		opacity: Object.fromEntries(Array.from({ length: 101 }, (_, i) => [i, `${i / 100}`])),
   		borderRadius: {
+  			'2xl': 'calc(var(--radius) + 6px)',
+  			xl: 'calc(var(--radius) + 2px)',
   			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
+  			md: 'calc(var(--radius) - 4px)',
+  			sm: 'calc(var(--radius) - 6px)'
   		},
   		colors: {
   			background: 'hsl(var(--background))',
@@ -23,7 +25,9 @@ module.exports = {
   			},
   			primary: {
   				DEFAULT: 'hsl(var(--primary))',
-  				foreground: 'hsl(var(--primary-foreground))'
+  				foreground: 'hsl(var(--primary-foreground))',
+  				soft: 'hsl(var(--primary-soft))',
+  				strong: 'hsl(var(--primary-strong))'
   			},
   			secondary: {
   				DEFAULT: 'hsl(var(--secondary))',
@@ -41,6 +45,28 @@ module.exports = {
   				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'
   			},
+  			/* Semantic tokens */
+  			success: {
+  				DEFAULT: 'hsl(var(--success))',
+  				foreground: 'hsl(var(--success-foreground))'
+  			},
+  			warning: {
+  				DEFAULT: 'hsl(var(--warning))',
+  				foreground: 'hsl(var(--warning-foreground))'
+  			},
+  			danger: {
+  				DEFAULT: 'hsl(var(--danger))',
+  				foreground: 'hsl(var(--danger-foreground))'
+  			},
+  			online: 'hsl(var(--online))',
+  			unread: 'hsl(var(--unread))',
+  			study: {
+  				DEFAULT: 'hsl(var(--study))',
+  				foreground: 'hsl(var(--study-foreground))'
+  			},
+  			focus: 'hsl(var(--focus))',
+  			scheduled: 'hsl(var(--scheduled))',
+  			completed: 'hsl(var(--completed))',
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
@@ -68,22 +94,19 @@ module.exports = {
   			display: ['var(--font-display)'],
   			mono: ['var(--font-mono)']
   		},
+  		boxShadow: {
+  			soft: 'var(--shadow-md)',
+  			float: 'var(--shadow-lg)',
+  			accent: 'var(--shadow-accent)'
+  		},
   		keyframes: {
   			'accordion-down': {
-  				from: {
-  					height: '0'
-  				},
-  				to: {
-  					height: 'var(--radix-accordion-content-height)'
-  				}
+  				from: { height: '0' },
+  				to: { height: 'var(--radix-accordion-content-height)' }
   			},
   			'accordion-up': {
-  				from: {
-  					height: 'var(--radix-accordion-content-height)'
-  				},
-  				to: {
-  					height: '0'
-  				}
+  				from: { height: 'var(--radix-accordion-content-height)' },
+  				to: { height: '0' }
   			}
   		},
   		animation: {

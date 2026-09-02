@@ -1,5 +1,6 @@
 import React from "react";
 import { CheckCircle2, Circle } from "lucide-react";
+import { ProgressRing, Chip } from "@/components/sira";
 
 export default function ScheduleDashboard({ sessions }) {
   const total = sessions.length;
@@ -18,25 +19,23 @@ export default function ScheduleDashboard({ sessions }) {
     .map(([k, v]) => ({ subject: k, pct: Math.round(v.sum / v.n), done: v.done, n: v.n }))
     .sort((a, b) => b.pct - a.pct);
 
+  if (total === 0) return null;
+
   return (
-    <div className="mb-6 rounded-2xl border border-border bg-background p-5 shadow-sm">
+    <div className="mb-6 rounded-2xl border border-border bg-card p-5 shadow-soft">
       <div className="flex flex-wrap items-center gap-4">
         <div className="flex items-center gap-3">
-          <div className="relative h-14 w-14">
-            <svg className="h-14 w-14 -rotate-90" viewBox="0 0 36 36">
-              <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3" className="text-muted/40" />
-              <circle cx="18" cy="18" r="15" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray={`${(overall / 100) * 94.2} 94.2`} className="text-[#FF4D00]" strokeLinecap="round" />
-            </svg>
-            <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-foreground">{overall}%</span>
-          </div>
+          <ProgressRing value={overall} size={56} stroke={5} barClassName="text-primary">
+            <span className="text-sm font-bold text-foreground tabnums">{overall}%</span>
+          </ProgressRing>
           <div>
             <p className="text-xs font-medium text-muted-foreground">Overall progress</p>
-            <p className="text-sm font-semibold text-foreground">{completed}/{total} sessions done</p>
+            <p className="text-sm font-semibold text-foreground tabnums">{completed}/{total} sessions done</p>
           </div>
         </div>
         <div className="flex gap-2">
-          <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700"><CheckCircle2 className="h-3.5 w-3.5" />{completed} done</span>
-          <span className="flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-medium text-[#CC3D00]"><Circle className="h-3.5 w-3.5" />{total - completed} remaining</span>
+          <Chip tone="success" icon={CheckCircle2}>{completed} done</Chip>
+          <Chip tone="warning" icon={Circle}>{total - completed} remaining</Chip>
         </div>
       </div>
 
@@ -46,10 +45,10 @@ export default function ScheduleDashboard({ sessions }) {
             <div key={s.subject}>
               <div className="mb-1 flex justify-between text-[11px]">
                 <span className="font-medium text-foreground">{s.subject}</span>
-                <span className="text-muted-foreground">{s.pct}% · {s.done}/{s.n}</span>
+                <span className="text-muted-foreground tabnums">{s.pct}% · {s.done}/{s.n}</span>
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                <div className="h-full rounded-full bg-gradient-to-r from-orange-500 to-orange-500" style={{ width: `${s.pct}%` }} />
+                <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${s.pct}%` }} />
               </div>
             </div>
           ))}

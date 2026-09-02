@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useI18n } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 const SIZE = 3;
 const GOAL = [1, 2, 3, 4, 5, 6, 7, 8, null];
@@ -17,6 +19,7 @@ function shuffle() {
 }
 
 export default function SlidingPuzzle() {
+  const { t } = useI18n();
   const [tiles, setTiles] = useState(shuffle);
   const [moves, setMoves] = useState(0);
   const empty = tiles.indexOf(null);
@@ -32,10 +35,10 @@ export default function SlidingPuzzle() {
 
   const move = (i) => {
     if (!neighbors(empty).includes(i)) return;
-    const t = [...tiles];
-    t[empty] = t[i];
-    t[i] = null;
-    setTiles(t);
+    const t2 = [...tiles];
+    t2[empty] = t2[i];
+    t2[i] = null;
+    setTiles(t2);
     setMoves((m) => m + 1);
   };
 
@@ -44,15 +47,26 @@ export default function SlidingPuzzle() {
 
   return (
     <div className="mx-auto max-w-xs">
-      <p className="mb-3 text-center text-sm font-medium text-foreground">{won ? `Solved in ${moves} moves!` : `Moves: ${moves}`}</p>
+      <p className="mb-3 text-center text-sm font-semibold text-foreground">
+        {won ? t("relak.g.solvedIn", { n: moves }) : t("relak.g.moves", { n: moves })}
+      </p>
       <div className="grid grid-cols-3 gap-2">
         {tiles.map((v, i) => (
-          <button key={i} onClick={() => move(i)} className={`flex h-20 items-center justify-center rounded-2xl border text-2xl font-bold transition ${v == null ? "border-dashed border-border bg-transparent" : "border-border bg-gradient-to-br from-orange-500 to-[#FF6B2C] text-white hover:opacity-90"}`}>
+          <button
+            key={i}
+            onClick={() => move(i)}
+            className={cn(
+              "flex h-20 items-center justify-center rounded-2xl border text-2xl font-bold transition active:scale-95",
+              v == null ? "border-dashed border-border bg-transparent" : "border-transparent bg-sira text-white hover:brightness-105"
+            )}
+          >
             {v ?? ""}
           </button>
         ))}
       </div>
-      <button onClick={reset} className="mt-4 w-full rounded-xl bg-[#FF6B2C] py-2.5 text-sm font-medium text-white transition hover:bg-amber-700">Shuffle</button>
+      <button onClick={reset} className="press mt-4 w-full rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow-accent transition hover:bg-primary-strong">
+        {t("relak.g.shuffle")}
+      </button>
     </div>
   );
 }

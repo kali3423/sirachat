@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useI18n } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 const LINES = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
 
@@ -31,6 +33,7 @@ function minimax(b, player) {
 }
 
 export default function TicTacToe() {
+  const { t } = useI18n();
   const [board, setBoard] = useState(Array(9).fill(null));
   const [xNext, setXNext] = useState(true); // you = X, robot = O
   const w = calcWinner(board);
@@ -59,19 +62,28 @@ export default function TicTacToe() {
   };
 
   const reset = () => { setBoard(Array(9).fill(null)); setXNext(true); };
-  const status = w === "O" ? "Robot wins!" : w === "X" ? "You win!" : draw ? "It's a draw!" : xNext ? "Your turn (X)" : "Robot thinking…";
+  const status = w === "O" ? t("relak.g.robotWins") : w === "X" ? t("relak.g.youWin") : draw ? t("relak.g.draw") : xNext ? t("relak.g.yourTurn") : t("relak.g.thinking");
 
   return (
     <div className="mx-auto max-w-xs">
-      <p className="mb-3 text-center text-sm font-medium text-foreground">{status}</p>
+      <p className="mb-3 text-center text-sm font-semibold text-foreground">{status}</p>
       <div className="grid grid-cols-3 gap-2">
         {board.map((v, i) => (
-          <button key={i} onClick={() => click(i)} className={`flex h-20 items-center justify-center rounded-2xl border border-border bg-background text-3xl font-bold transition hover:bg-muted ${v === "X" ? "text-[#FF4D00]" : v === "O" ? "text-[#FF4D00]" : "text-transparent"}`}>
+          <button
+            key={i}
+            onClick={() => click(i)}
+            className={cn(
+              "flex h-20 items-center justify-center rounded-2xl border border-border bg-background text-3xl font-bold transition hover:bg-muted active:scale-95",
+              v === "X" ? "text-primary" : v === "O" ? "text-focus" : "text-transparent"
+            )}
+          >
             {v || "·"}
           </button>
         ))}
       </div>
-      <button onClick={reset} className="mt-4 w-full rounded-xl bg-[#FF6B2C] py-2.5 text-sm font-medium text-white transition hover:bg-amber-700">New round</button>
+      <button onClick={reset} className="press mt-4 w-full rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow-accent transition hover:bg-primary-strong">
+        {t("relak.g.newRound")}
+      </button>
     </div>
   );
 }

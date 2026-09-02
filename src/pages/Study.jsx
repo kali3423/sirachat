@@ -2,12 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import ActiveSession from "@/components/study/ActiveSession";
 import StudyDashboard from "@/components/study/StudyDashboard";
-import { Plus, Clock, Play, Trash2, Loader2 } from "lucide-react";
-import T from "@/components/T";
+import { Plus, Clock, Play, Trash2, Loader2, GraduationCap, CalendarPlus } from "lucide-react";
+import { PageShell, PageHeader, EmptyState, Chip, IconButton, BottomSheet } from "@/components/sira";
+import { SkeletonCard } from "@/components/sira/Skeleton";
+import { useI18n } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 const STARTING = 500, LEGEND = 1000, COMPLETE = 100, BREAK_P = 10, QUIT_P = 100;
 
 export default function Study() {
+  const { t } = useI18n();
   const [me, setMe] = useState(null);
   const [meets, setMeets] = useState([]);
   const [history, setHistory] = useState([]);
@@ -23,8 +27,8 @@ export default function Study() {
       const ms = await base44.entities.StudyMeet.list("-created_date", 100).catch(() => []);
       let hh = [];
       if (m) hh = await base44.entities.StudyHistory.filter({ user_id: m.id }, "-created_date", 200).catch(() => []);
-      setMe(m); 
-      setMeets(Array.isArray(ms) ? ms : []); 
+      setMe(m);
+      setMeets(Array.isArray(ms) ? ms : []);
       setHistory(Array.isArray(hh) ? hh : []);
     } finally {
       setLoading(false);
@@ -130,77 +134,156 @@ export default function Study() {
 
   const removeMeet = async (id) => base44.entities.StudyMeet.delete(id);
 
+  // scheduled first, then active, then completed last; by date within
+  const sortedMeets = [...meets].sort((a, b) => {
+    const rank = { active: 0, scheduled: 1, completed: 2 };
+    const ra = rank[a.status] ?? 1, rb = rank[b.status] ?? 1;
+    if (ra !== rb) return ra - rb;
+    return `${a.date}T${a.start_time}`.localeCompare(`${b.date}T${b.start_time}`);
+  });
+
   return (
-    <div className="h-full overflow-y-auto bg-gradient-to-b from-slate-50 to-orange-50/30 dark:bg-none dark:bg-background">
-      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground"><T k="study.title" /></h1>
-            <p className="text-sm text-muted-foreground"><T k="study.sub" /></p>
-          </div>
-          <button onClick={() => setShowForm((v) => !v)} className="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-orange-500 to-[#FF6B2C] px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-[#FF4D00]/30 transition hover:opacity-90">
-            <Plus className="h-4 w-4" /> <T k="common.new" />
+    <PageShell width="2xl">
+      <PageHeader
+        icon={GraduationCap}
+        title={t("study.title") || "Study"}
+        subtitle={t("study.sub") || "Plan sessions, stay focused, earn points."}
+        actions={
+          <button
+            onClick={() => setShowForm(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-accent transition hover:bg-primary-strong press"
+          >
+            <Plus className="h-4 w-4" /> {t("common.new") || "New"}
           </button>
+        }
+      />
+
+      {loading ? (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+          <div className="space-y-3 lg:col-span-3">
+            {Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)}
+          </div>
+          <div className="lg:col-span-2"><SkeletonCard /></div>
         </div>
+      ) : (
+        <>
+          {activeMeet && (
+            <ActiveSession meet={activeMeet} onBreak={takeBreak} onQuit={quit} busy={busy} />
+          )}
 
-        {loading ? (
-          <div className="flex justify-center py-12"><div className="h-6 w-6 animate-spin rounded-full border-2 border-orange-200 border-t-amber-600" /></div>
-        ) : (
-          <>
-            {activeMeet && (
-              <ActiveSession meet={activeMeet} onBreak={takeBreak} onQuit={quit} busy={busy} />
-            )}
-
-            <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-              <div className="lg:col-span-3">
-                {showForm && (
-                  <form onSubmit={createMeet} className="mb-4 space-y-3 rounded-2xl border border-border bg-background p-4 shadow-sm">
-                    <input value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} placeholder="Subject (e.g. Mathematics)" className="w-full rounded-xl border border-border bg-muted/40 px-3.5 py-2.5 text-sm outline-none focus:border-[#FF8047] focus:bg-background" />
-                    <div className="grid grid-cols-3 gap-2">
-                      <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="rounded-xl border border-border bg-muted/40 px-3 py-2.5 text-sm outline-none focus:border-[#FF8047]" />
-                      <input type="time" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} className="rounded-xl border border-border bg-muted/40 px-3 py-2.5 text-sm outline-none focus:border-[#FF8047]" />
-                      <input type="time" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} className="rounded-xl border border-border bg-muted/40 px-3 py-2.5 text-sm outline-none focus:border-[#FF8047]" />
-                    </div>
-                    <button type="submit" disabled={busy} className="w-full rounded-xl bg-[#FF6B2C] py-2.5 text-sm font-medium text-white transition hover:bg-amber-700 disabled:opacity-60">
-                      {busy ? <Loader2 className="mx-auto h-4 w-4 animate-spin" /> : "Create"}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
+            <div className="lg:col-span-3">
+              <h2 className="mb-3 text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                Study sessions
+              </h2>
+              {sortedMeets.length === 0 ? (
+                <EmptyState
+                  icon={CalendarPlus}
+                  title="No study sessions yet"
+                  description="Schedule your first focused study block to start earning points."
+                  action={
+                    <button
+                      onClick={() => setShowForm(true)}
+                      className="inline-flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-accent transition hover:bg-primary-strong press"
+                    >
+                      <Plus className="h-4 w-4" /> Schedule a session
                     </button>
-                  </form>
-                )}
-
-                <div className="space-y-3">
-                  {meets.length === 0 ? (
-                    <p className="rounded-2xl border border-dashed border-border py-12 text-center text-sm text-muted-foreground">No study rendezvous yet. Create one to begin.</p>
-                  ) : (
-                    meets.map((m) => (
-                      <div key={m.id} className="group flex items-center gap-3 rounded-2xl border border-border bg-background p-4 shadow-sm">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-orange-50 text-[#FF4D00]"><Clock className="h-5 w-5" /></div>
-                        <div className="min-w-0 flex-1">
-                          <p className="truncate text-sm font-semibold text-foreground">{m.subject}</p>
-                          <p className="text-[11px] text-muted-foreground">{m.date} · {m.start_time}–{m.end_time}</p>
-                        </div>
-                        {m.status === "completed" ? (
-                          <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">Completed</span>
-                        ) : m.status === "active" ? (
-                          <span className="flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-[11px] font-medium text-[#CC3D00]"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-orange-500" />Live</span>
-                        ) : (
-                          <div className="flex items-center gap-1">
-                            <button onClick={() => startMeet(m)} disabled={busy} className="flex items-center gap-1 rounded-lg bg-[#FF6B2C] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-amber-700 disabled:opacity-60"><Play className="h-3.5 w-3.5" />Start</button>
-                            <button onClick={() => removeMeet(m.id)} className="rounded-lg p-1.5 text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
-                          </div>
-                        )}
+                  }
+                />
+              ) : (
+                <div className="space-y-2.5">
+                  {sortedMeets.map((m) => (
+                    <div
+                      key={m.id}
+                      className={cn(
+                        "group flex items-center gap-3 rounded-2xl border bg-card p-4 shadow-sm transition-colors",
+                        m.status === "active" ? "border-study/40" : "border-border hover:border-primary/25"
+                      )}
+                    >
+                      <div className={cn(
+                        "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl",
+                        m.status === "completed" ? "bg-completed/12 text-completed"
+                          : m.status === "active" ? "bg-study/15 text-study-foreground dark:text-study"
+                          : "bg-scheduled/12 text-scheduled"
+                      )}>
+                        <Clock className="h-5 w-5" />
                       </div>
-                    ))
-                  )}
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold text-foreground">{m.subject}</p>
+                        <p className="text-[11px] text-muted-foreground tabnums">{m.date} · {m.start_time}–{m.end_time}</p>
+                      </div>
+                      {m.status === "completed" ? (
+                        <Chip tone="completed" dot>Completed</Chip>
+                      ) : m.status === "active" ? (
+                        <Chip tone="study"><span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current" />Live</Chip>
+                      ) : (
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => startMeet(m)}
+                            disabled={busy}
+                            className="inline-flex items-center gap-1 rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground transition hover:bg-primary-strong disabled:opacity-60 press"
+                          >
+                            <Play className="h-3.5 w-3.5" />Start
+                          </button>
+                          <IconButton variant="danger" size="sm" aria-label="Delete session" onClick={() => removeMeet(m.id)}>
+                            <Trash2 />
+                          </IconButton>
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
-              </div>
-
-              <div className="lg:col-span-2">
-                <StudyDashboard points={points} level={level} history={history} />
-              </div>
+              )}
             </div>
-          </>
-        )}
-      </div>
-    </div>
+
+            <div className="lg:col-span-2">
+              <StudyDashboard points={points} level={level} history={history} />
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Create-session sheet */}
+      <BottomSheet
+        open={showForm}
+        onOpenChange={setShowForm}
+        title="New study session"
+        description="Block out a focused window and earn points when you complete it."
+      >
+        <form onSubmit={createMeet} className="space-y-3">
+          <div>
+            <label className="mb-1.5 block text-xs font-semibold text-muted-foreground">Subject</label>
+            <input
+              value={form.subject}
+              onChange={(e) => setForm({ ...form, subject: e.target.value })}
+              placeholder="e.g. Mathematics"
+              autoFocus
+              className="w-full rounded-xl border border-input bg-background px-3.5 py-3 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+            />
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-muted-foreground">Date</label>
+              <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} className="w-full rounded-xl border border-input bg-background px-3 py-3 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring tabnums" />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-muted-foreground">Start</label>
+              <input type="time" value={form.start_time} onChange={(e) => setForm({ ...form, start_time: e.target.value })} className="w-full rounded-xl border border-input bg-background px-3 py-3 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring tabnums" />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-xs font-semibold text-muted-foreground">End</label>
+              <input type="time" value={form.end_time} onChange={(e) => setForm({ ...form, end_time: e.target.value })} className="w-full rounded-xl border border-input bg-background px-3 py-3 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring tabnums" />
+            </div>
+          </div>
+          <button
+            type="submit"
+            disabled={busy || !form.subject.trim()}
+            className="mt-1 inline-flex w-full items-center justify-center gap-1.5 rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground shadow-accent transition hover:bg-primary-strong disabled:opacity-60 press"
+          >
+            {busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <><CalendarPlus className="h-4 w-4" /> Create session</>}
+          </button>
+        </form>
+      </BottomSheet>
+    </PageShell>
   );
 }

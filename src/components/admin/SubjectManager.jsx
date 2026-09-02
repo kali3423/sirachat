@@ -77,12 +77,12 @@ export default function SubjectManager() {
   return (
     <div>
       <form onSubmit={addSubject} className="mb-6 rounded-2xl border border-border bg-background p-4 shadow-sm">
-        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom de la matière" className="mb-3 w-full rounded-xl border border-border bg-muted/40 px-3.5 py-2.5 text-sm outline-none focus:border-[#FF8047] focus:bg-background" />
+        <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nom de la matière" className="mb-3 w-full rounded-xl border border-border bg-muted/40 px-3.5 py-2.5 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring focus:bg-background" />
         <div className="mb-3">
           <p className="mb-1.5 text-[11px] font-medium text-muted-foreground">Couleur</p>
           <div className="flex flex-wrap items-center gap-1.5">
             {COLORS.map((c) => (
-              <button type="button" key={c} onClick={() => setColor(c)} className={`h-7 w-7 rounded-full ${color === c ? "ring-2 ring-offset-2 ring-amber-500" : ""}`} style={{ backgroundColor: c }} />
+              <button type="button" key={c} onClick={() => setColor(c)} className={`h-7 w-7 rounded-full transition ${color === c ? "ring-2 ring-primary ring-offset-2 ring-offset-background" : ""}`} style={{ backgroundColor: c }} />
             ))}
           </div>
         </div>
@@ -90,13 +90,13 @@ export default function SubjectManager() {
           <p className="mb-1.5 text-[11px] font-medium text-muted-foreground">Icône</p>
           <div className="flex flex-wrap items-center gap-1.5">
             {Object.entries(ICONS).map(([key, I]) => (
-              <button type="button" key={key} onClick={() => setIcon(key)} className={`flex h-8 w-8 items-center justify-center rounded-lg border ${icon === key ? "border-[#FF4D00] bg-orange-50 text-[#FF4D00]" : "border-border text-muted-foreground"}`}>
+              <button type="button" key={key} onClick={() => setIcon(key)} className={`flex h-8 w-8 items-center justify-center rounded-lg border transition ${icon === key ? "border-primary bg-primary-soft text-primary" : "border-border text-muted-foreground hover:bg-muted"}`}>
                 <I className="h-4 w-4" />
               </button>
             ))}
           </div>
         </div>
-        <button type="submit" disabled={busy} className="flex items-center gap-1.5 rounded-xl bg-gradient-to-br from-orange-500 to-[#FF6B2C] px-4 py-2.5 text-sm font-medium text-white shadow-lg shadow-[#FF4D00]/30 disabled:opacity-50">
+        <button type="submit" disabled={busy} className="flex items-center gap-1.5 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-accent transition hover:bg-primary-strong disabled:opacity-50 press">
           <Plus className="h-4 w-4" /> Ajouter
         </button>
       </form>
@@ -125,18 +125,18 @@ export default function SubjectManager() {
               {isOpen && (
                 <div className="border-t border-border p-3">
                   <div className="mb-3 flex flex-wrap items-center gap-2">
-                    <input value={lessonTitle[s.id] || ""} onChange={(e) => setLessonTitle((p) => ({ ...p, [s.id]: e.target.value }))} placeholder="Lesson title" className="min-w-[140px] flex-1 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm outline-none focus:border-[#FF8047] focus:bg-background" />
+                    <input value={lessonTitle[s.id] || ""} onChange={(e) => setLessonTitle((p) => ({ ...p, [s.id]: e.target.value }))} placeholder="Lesson title" className="min-w-[140px] flex-1 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring focus:bg-background" />
                     <input ref={(el) => { fileRefs.current[s.id] = el; }} type="file" accept="application/pdf" hidden onChange={(e) => { const f = e.target.files?.[0]; if (f) onPdf(s.id, f); }} />
                     <button type="button" onClick={() => fileRefs.current[s.id]?.click()} className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-xs font-medium hover:bg-muted">
                       {uploadingFor === s.id ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />} {pdfUrl[s.id] ? "PDF ✓" : "Upload PDF"}
                     </button>
-                    <button type="button" onClick={() => addLesson(s.id)} disabled={busy || !pdfUrl[s.id] || !(lessonTitle[s.id] || "").trim()} className="rounded-lg bg-[#FF6B2C] px-3 py-2 text-xs font-medium text-white disabled:opacity-50">Add lesson</button>
+                    <button type="button" onClick={() => addLesson(s.id)} disabled={busy || !pdfUrl[s.id] || !(lessonTitle[s.id] || "").trim()} className="rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground transition hover:bg-primary-strong disabled:opacity-50 press">Add lesson</button>
                   </div>
                   <div className="space-y-1.5">
                     {ls.length === 0 && <p className="text-[11px] text-muted-foreground">No lessons yet.</p>}
                     {ls.map((l) => (
                       <div key={l.id} className="group flex items-center gap-2 rounded-lg border border-border px-3 py-2">
-                        <FileText className="h-4 w-4 text-[#FF4D00]" />
+                        <FileText className="h-4 w-4 text-primary" />
                         <a href={l.pdf_url} target="_blank" rel="noreferrer" className="min-w-0 flex-1 truncate text-sm text-foreground hover:underline">{l.title}</a>
                         <button onClick={() => removeLesson(l.id)} className="rounded p-1 text-muted-foreground opacity-0 hover:text-destructive group-hover:opacity-100">
                           <Trash2 className="h-3.5 w-3.5" />

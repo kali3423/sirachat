@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useI18n } from "@/lib/i18n";
+import { cn } from "@/lib/utils";
 
 const EMOJIS = ["🍎", "🍌", "🍇", "🍒", "🥝", "🍉", "🍓", "🍑"];
 
@@ -8,6 +10,7 @@ const buildDeck = () =>
     .sort(() => Math.random() - 0.5);
 
 export default function MemoryMatch() {
+  const { t } = useI18n();
   const [cards, setCards] = useState(buildDeck);
   const [flipped, setFlipped] = useState([]);
   const [busy, setBusy] = useState(false);
@@ -44,21 +47,26 @@ export default function MemoryMatch() {
 
   return (
     <div className="mx-auto max-w-sm">
-      <p className="mb-3 text-center text-sm font-medium text-foreground">
-        {won ? `Solved in ${moves} moves!` : `Moves: ${moves}`}
+      <p className="mb-3 text-center text-sm font-semibold text-foreground">
+        {won ? t("relak.g.solvedIn", { n: moves }) : t("relak.g.moves", { n: moves })}
       </p>
       <div className="grid grid-cols-4 gap-2">
         {cards.map((c, i) => (
           <button
             key={c.id}
             onClick={() => flip(i)}
-            className={`flex h-16 items-center justify-center rounded-2xl border text-2xl transition ${c.flipped || c.matched ? "border-transparent bg-orange-50" : "border-border bg-background hover:bg-muted"}`}
+            className={cn(
+              "flex h-16 items-center justify-center rounded-2xl border text-2xl transition active:scale-95",
+              c.flipped || c.matched ? "border-primary/30 bg-primary-soft" : "border-border bg-background hover:bg-muted"
+            )}
           >
             {c.flipped || c.matched ? c.emoji : "❓"}
           </button>
         ))}
       </div>
-      <button onClick={reset} className="mt-4 w-full rounded-xl bg-fuchsia-600 py-2.5 text-sm font-medium text-white transition hover:bg-fuchsia-700">New game</button>
+      <button onClick={reset} className="press mt-4 w-full rounded-xl bg-primary py-2.5 text-sm font-semibold text-primary-foreground shadow-accent transition hover:bg-primary-strong">
+        {t("relak.g.newGame")}
+      </button>
     </div>
   );
 }

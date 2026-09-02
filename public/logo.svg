@@ -1,28 +1,25 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" fill="none">
+<svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" style="stop-color:#FDB913;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#FF6B35;stop-opacity:1" />
+    <linearGradient id="tile" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFDF9"/>
+      <stop offset="1" stop-color="#F1EADF"/>
+    </linearGradient>
+    <linearGradient id="ring" x1="120" y1="70" x2="400" y2="430" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFA23A"/>
+      <stop offset="0.55" stop-color="#FF7A12"/>
+      <stop offset="1" stop-color="#F0530A"/>
+    </linearGradient>
+    <linearGradient id="book" x1="150" y1="190" x2="360" y2="300" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFC069"/>
+      <stop offset="0.5" stop-color="#FF8A2A"/>
+      <stop offset="1" stop-color="#FF6A12"/>
     </linearGradient>
   </defs>
-  
-  <!-- Background -->
-  <rect width="1024" height="1024" rx="226" fill="#F5F5F5"/>
-  
-  <!-- Chat bubble ring with gradient -->
-  <path d="M512 170C339.5 170 200 309.5 200 482C200 573 237 656 297 717L257 824L394 777C440 795 490 806 544 806C716.5 806 856 666.5 856 494C856 321.5 716.5 170 544 170Z" 
-        fill="url(#gradient)" 
-        stroke="url(#gradient)" 
-        stroke-width="20"/>
-  
-  <!-- White inner circle -->
-  <circle cx="512" cy="492" r="250" fill="#FFFFFF"/>
-  
-  <!-- Book icon with gradient -->
-  <path d="M400 380C390 380 380 390 380 400V620C380 630 390 640 400 640H475V380H400Z" 
-        fill="url(#gradient)"/>
-  <path d="M475 380V640H550C560 640 570 630 570 620V400C570 390 560 380 550 380H475Z" 
-        fill="url(#gradient)"/>
-  <path d="M475 375L475 385" stroke="url(#gradient)" stroke-width="5" stroke-linecap="round"/>
-  <path d="M475 635L475 645" stroke="url(#gradient)" stroke-width="5" stroke-linecap="round"/>
+  <rect x="16" y="16" width="480" height="480" rx="116" fill="url(#tile)"/>
+  <rect x="16.5" y="16.5" width="479" height="479" rx="115.5" fill="none" stroke="#000000" stroke-opacity="0.05"/>
+  <path d="M150 374 C150 344 158 328 178 308 L226 348 C206 366 182 376 150 374 Z" fill="url(#ring)"/>
+  <circle cx="256" cy="238" r="150" fill="none" stroke="url(#ring)" stroke-width="42"/>
+  <path d="M256 200 C230 186 196 181 166 185 C156 186 149 194 149 204 L149 286 C149 286 192 279 224 288 C238 292 250 299 256 304 Z" fill="url(#book)"/>
+  <path d="M256 200 C282 186 316 181 346 185 C356 186 363 194 363 204 L363 286 C363 286 320 279 288 288 C274 292 262 299 256 304 Z" fill="url(#book)"/>
+  <path d="M256 200 L256 304" stroke="#E8560A" stroke-opacity="0.35" stroke-width="6" stroke-linecap="round"/>
 </svg>
